@@ -20,51 +20,80 @@
 
     @if (Model != null && Model.Any())
     {
+        <div class="movie-list-all-container">
+            <div class="container my-4">
 
-        <div class="container">
-            <div class="row">
-                @foreach (var movie in Model)
-                {
-                    <div class="col-12 mb-4">
-                        <div class="card movie-card">
+                <div class="movies-grid">
+                    @foreach (var movie in Model)
+                    {
+                        <div class="movie-card mb-4 bg-white rounded-3 shadow-sm overflow-hidden">
                             <div class="row g-0">
                                 <!-- Image Column -->
-                                <div class="col-md-2">
+                                <div class="col-md-3 col-lg-2 poster-container">
                                     <img src="@movie.ImageUrl"
-                                         class="card-img"
+                                         class="movie-poster"
                                          alt="@movie.Title">
                                 </div>
 
                                 <!-- Content Column -->
-                                <div class="col-md-8">
+                                <div class="col-md-9 col-lg-10">
                                     <div class="card-body d-flex flex-column h-100">
-                                        <h5 class="movie-title">@movie.Title</h5>
-                                        <p class="movie-description">@movie.Description</p>
-                                        <p class="movie-genre">
-                                            <strong>Genre:</strong> @movie.Genre
-                                        </p>
+                                        <div class="mb-3">
+                                            <h5 class="movie-title">@movie.Title</h5>
 
-                                        <!-- Action Buttons -->
-                                        <div class="action-buttons mt-auto">
+                                            <div class="d-flex align-items-center mb-3">
+                                                <div class="stars-rating me-2">
+                                                    @{
+                                                        var rating = movie.AverageRating ?? 0;
+                                                        for (int i = 0; i < 5; i++)
+                                                        {
+                                                            if (i < rating / 2)
+                                                            {
+                                                                <i class="fas fa-star text-warning"></i>
+                                                            }
+                                                            else if (i == Math.Floor(rating / 2.0) && rating % 2 != 0)
+                                                            {
+                                                                <i class="fas fa-star-half-alt text-warning"></i>
+                                                            }
+                                                            else
+                                                            {
+                                                                <i class="far fa-star text-warning"></i>
+                                                            }
+                                                        }
+                                                    }
+                                                </div>
+                                                <span class="rating-text">
+                                                    @(movie.AverageRating?.ToString("F1") ?? "0.0")/10
+                                                </span>
+                                            </div>
+
+                                            <div class="movie-genre mb-3">
+                                                <span class="badge"><i class="fas fa-film me-2"></i>@movie.Genre</span>
+                                            </div>
+
+                                            <p class="movie-description">@movie.Description</p>
+                                        </div>
+
+                                        <div class="movie-actions mt-auto">
                                             <a href="@Url.Action("ShowDetail", "Movie", new { id = movie.MovieID })"
                                                class="btn btn-info">
-                                                Show Detail
+                                                <i class="fas fa-info-circle me-2"></i>Show Detail
                                             </a>
                                             <a href="@movie.MovieUrl"
                                                class="btn btn-primary">
-                                                Watch Now
+                                                <i class="fas fa-play me-2"></i>Watch Now
                                             </a>
 
                                             @if (movie.UserID == currentUserId)
                                             {
                                                 <a href="@Url.Action("EditMovie", "Movie", new { id = movie.MovieID })"
                                                    class="btn btn-warning">
-                                                    Edit Movie
+                                                    <i class="fas fa-edit me-2"></i>Edit Movie
                                                 </a>
                                                 <button type="button"
                                                         class="btn btn-danger show-confirmation-modal"
                                                         data-id="@movie.MovieID">
-                                                    Delete Movie
+                                                    <i class="fas fa-trash-alt me-2"></i>Delete Movie
                                                 </button>
                                             }
                                         </div>
@@ -72,14 +101,18 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                }
+                    }
+                </div>
             </div>
         </div>
     }
     else
     {
-        <h3>No movies available.</h3>
+        <div class="container mt-5">
+            <div class="alert alert-info text-center">
+                <i class="fas fa-film me-2"></i>No movies available.
+            </div>
+        </div>
     }
     <div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel">
         <div class="modal-dialog">
