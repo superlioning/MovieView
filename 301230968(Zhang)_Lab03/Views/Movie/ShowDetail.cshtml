@@ -12,175 +12,196 @@
     </div>
 
     <div class="container mt-4">
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card movie-details-card">
-                <div class="row g-0">
-                    <!-- Movie Poster -->
-                    <div class="col-md-4">
-                        <div class="poster-container">
-                            <img src="@Model.ImageUrl" class="movie-poster" alt="@Model.Title poster">
-                        </div>
-                    </div>
-
-                    <!-- Movie Details -->
-                    <div class="col-md-8">
-                        <div class="card-body p-4">
-                            <h1 class="movie-title mb-3">@Model.Title</h1>
-                            
-                            <!-- Rating Section -->
-                            <div class="rating-section mb-4">
-                                <div class="d-flex align-items-center gap-3">
-                                    <button type="button" class="btn btn-primary me-2" id="openModalBtn">
-                                        <i class="fas fa-star me-2"></i>Rate Movie
-                                    </button>
-                                    <div class="average-rating me-2">
-                                        <i class="fas fa-star text-warning"></i>
-                                        <span class="ms-1">@((Model.AverageRating ?? 0).ToString())/10</span>
-                                    </div>
-                                    @{
-                                        var specificUserID = currentUserId;
-                                        var userRating = 0;
-                                        if (Model.Ratings != null)
-                                        {
-                                            userRating = Model.Ratings.FirstOrDefault(r => r.UserID == specificUserID)?.RateValue ?? 0;
-                                        }
-                                    }
-                                    <div class="user-rating">
-                                        <i class="fas fa-user me-1"></i>
-                                        <span>Your Rating: @userRating/10</span>
-                                    </div>
-                                </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card movie-details-card">
+                    <div class="row g-0">
+                        <!-- Movie Poster -->
+                        <div class="col-md-4">
+                            <div class="poster-container">
+                                <img src="@Model.ImageUrl" class="movie-poster" alt="@Model.Title poster">
                             </div>
+                        </div>
 
-                            <!-- Movie Info Grid -->
-                            <div class="movie-info-grid">
-                                <div class="info-item">
-                                    <span class="info-label"><i class="fas fa-film me-2"></i>Genre</span>
-                                    <span class="info-value">@(string.IsNullOrEmpty(Model.Genre) ? "Genre not specified" : Model.Genre)</span>
-                                </div>
-                                
-                                <div class="info-item">
-                                    <span class="info-label"><i class="fas fa-video me-2"></i>Directors</span>
-                                    <span class="info-value">
-                                        @if (Model.Directors != null && Model.Directors.Any())
-                                        {
-                                            @string.Join(", ", Model.Directors)
-                                        }
-                                        else
-                                        {
-                                            @:Director information not available
-                                        }
-                                    </span>
-                                </div>
-                                
-                                <div class="info-item">
-                                    <span class="info-label"><i class="fas fa-users me-2"></i>Cast</span>
-                                    <span class="info-value">
-                                        @if (Model.Actors != null && Model.Actors.Any())
-                                        {
-                                            @string.Join(", ", Model.Actors)
-                                        }
-                                        else
-                                        {
-                                            @:Cast information not available
-                                        }
-                                    </span>
-                                </div>
-                                
-                                <div class="info-item">
-                                    <span class="info-label"><i class="fas fa-calendar-alt me-2"></i>Release Date</span>
-                                    <span class="info-value">
+                        <!-- Movie Details -->
+                        <div class="col-md-8">
+                            <div class="card-body p-4">
+                                <h1 class="movie-title mb-3">@Model.Title</h1>
+
+                                <!-- Rating Section -->
+                                <div class="rating-section mb-4">
+                                    <div class="d-flex align-items-center gap-3">
                                         @{
-                                            if (!string.IsNullOrEmpty(Model.ReleaseDate))
+                                            var specificUserID = currentUserId;
+                                            var userRating = 0;
+                                            if (Model.Ratings != null)
                                             {
-                                                if (DateTime.TryParse(Model.ReleaseDate, out DateTime releaseDate))
-                                                {
-                                                    @releaseDate.ToString("MMMM d, yyyy")
-                                                }
-                                                else
-                                                {
-                                                    @Model.ReleaseDate
-                                                }
+                                                userRating = Model.Ratings.FirstOrDefault(r => r.UserID == specificUserID)?.RateValue ?? 0;
+                                            }
+                                        }
+                                        @if (userRating == 0)
+                                        {
+                                            <button type="button" class="btn btn-primary me-2" id="openModalBtn">
+                                                <i class="fas fa-star me-2"></i>Rate Movie
+                                            </button>
+                                        }
+                                        <div class="average-rating me-2">
+                                            <i class="fas fa-star text-warning"></i>
+                                            <span class="ms-1">@((Model.AverageRating ?? 0).ToString())/10</span>
+                                        </div>
+                                        @if (userRating != 0)
+                                        {
+                                            <div class="user-rating">
+                                                <i class="fas fa-user me-1"></i>
+                                                <span>Your Rating: @userRating/10</span>
+                                            </div>
+                                        }
+                                        @if (userRating > 0 && (DateTime.Now - Model.Ratings.FirstOrDefault(r => r.UserID == currentUserId).RatingDateTime).TotalHours < 24)
+                                        {
+                                            <div class="rating-actions">
+                                                <button class="btn btn-sm btn-outline-primary edit-rating me-2"
+                                                        data-rating="@userRating"
+                                                        data-userid="@currentUserId">
+                                                    <i class="fas fa-edit"></i> Edit Rating
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger delete-rating"
+                                                        data-rating="@userRating"
+                                                        data-userid="@currentUserId">
+                                                    <i class="fas fa-trash-alt"></i> Delete Rating
+                                                </button>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+
+                                <!-- Movie Info Grid -->
+                                <div class="movie-info-grid">
+                                    <div class="info-item">
+                                        <span class="info-label"><i class="fas fa-film me-2"></i>Genre</span>
+                                        <span class="info-value">@(string.IsNullOrEmpty(Model.Genre) ? "Genre not specified" : Model.Genre)</span>
+                                    </div>
+
+                                    <div class="info-item">
+                                        <span class="info-label"><i class="fas fa-video me-2"></i>Directors</span>
+                                        <span class="info-value">
+                                            @if (Model.Directors != null && Model.Directors.Any())
+                                            {
+                                                @string.Join(", ", Model.Directors)
                                             }
                                             else
                                             {
-                                                @:Not available
+                                                @:Director information not available
                                             }
-                                        }
-                                    </span>
-                                </div>
-                            </div>
+                                        </span>
+                                    </div>
 
-                            <!-- Action Buttons -->
-                            <div class="action-buttons mt-4">
-                                <a href="@Url.Action("DownloadMovie", "Movie", new { movieId = Model.MovieID })" class="btn btn-primary">
-                                    <i class="fas fa-download me-2"></i>Download
-                                </a>
-                                <button id="createCommentModal" class="btn btn-secondary ms-2">
-                                    <i class="fas fa-comment me-2"></i>Add Comment
-                                </button>
+                                    <div class="info-item">
+                                        <span class="info-label"><i class="fas fa-users me-2"></i>Cast</span>
+                                        <span class="info-value">
+                                            @if (Model.Actors != null && Model.Actors.Any())
+                                            {
+                                                @string.Join(", ", Model.Actors)
+                                            }
+                                            else
+                                            {
+                                                @:Cast information not available
+                                            }
+                                        </span>
+                                    </div>
+
+                                    <div class="info-item">
+                                        <span class="info-label"><i class="fas fa-calendar-alt me-2"></i>Release Date</span>
+                                        <span class="info-value">
+                                            @{
+                                                if (!string.IsNullOrEmpty(Model.ReleaseDate))
+                                                {
+                                                    if (DateTime.TryParse(Model.ReleaseDate, out DateTime releaseDate))
+                                                    {
+                                                        @releaseDate.ToString("MMMM d, yyyy")
+                                                    }
+                                                    else
+                                                    {
+                                                        @Model.ReleaseDate
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    @:Not available
+                                                }
+                                            }
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="action-buttons mt-4">
+                                    <a href="@Url.Action("DownloadMovie", "Movie", new { movieId = Model.MovieID })" class="btn btn-primary">
+                                        <i class="fas fa-download me-2"></i>Download
+                                    </a>
+                                    <button id="createCommentModal" class="btn btn-secondary ms-2">
+                                        <i class="fas fa-comment me-2"></i>Add Comment
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Comments Section -->
-            <div class="comments-section mt-4">
-                <h3 class="comments-title mb-3">
-                    <i class="fas fa-comments me-2"></i>Comments
-                </h3>
-                
-                @if (Model.Comments != null && Model.Comments.Any())
-                {
-                    foreach (var comment in Model.Comments)
+                <!-- Comments Section -->
+                <div class="comments-section mt-4">
+                    <h3 class="comments-title mb-3">
+                        <i class="fas fa-comments me-2"></i>Comments
+                    </h3>
+
+                    @if (Model.Comments != null && Model.Comments.Any())
                     {
-                        <div class="comment-card mb-3">
-                            <div class="comment-header">
-                                @{
-                                    var visiblePart = comment.UserID.Substring(4);
-                                    var maskedUserID = new string('*', 4) + visiblePart;
-                                }
-                                <span class="user-id">@maskedUserID</span>
-                                <span class="comment-date">@comment.CommentDateTime.ToString("MMM dd, yyyy HH:mm")</span>
-                            </div>
-                            <div class="comment-body">
-                                <p>@comment.Message</p>
-                            </div>
-                            @if ((DateTime.Now - comment.CommentDateTime).TotalHours < 24 && comment.UserID == currentUserId)
-                            {
-                                <div class="comment-actions">
-                                    <button class="btn btn-sm btn-outline-primary edit-comment me-2"
-                                            data-message="@comment.Message"
-                                            data-userid="@comment.UserID"
-                                            data-commentdatetime="@comment.CommentDateTime.ToString("o")">
-                                        <i class="fas fa-edit"></i> Edit
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-danger delete-comment"
-                                            data-message="@comment.Message"
-                                            data-userid="@comment.UserID"
-                                            data-commentdatetime="@comment.CommentDateTime.ToString("o")">
-                                        <i class="fas fa-trash-alt"></i> Delete
-                                    </button>
+                        foreach (var comment in Model.Comments)
+                        {
+                            <div class="comment-card mb-3">
+                                <div class="comment-header">
+                                    @{
+                                        var visiblePart = comment.UserID.Substring(4);
+                                        var maskedUserID = new string('*', 4) + visiblePart;
+                                    }
+                                    <span class="user-id">@maskedUserID</span>
+                                    <span class="comment-date">@comment.CommentDateTime.ToString("MMM dd, yyyy HH:mm")</span>
                                 </div>
-                            }
+                                <div class="comment-body">
+                                    <p>@comment.Message</p>
+                                </div>
+                                @if ((DateTime.Now - comment.CommentDateTime).TotalHours < 24 && comment.UserID == currentUserId)
+                                {
+                                    <div class="comment-actions">
+                                        <button class="btn btn-sm btn-outline-primary edit-comment me-2"
+                                                data-message="@comment.Message"
+                                                data-userid="@comment.UserID"
+                                                data-commentdatetime="@comment.CommentDateTime.ToString("o")">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger delete-comment"
+                                                data-message="@comment.Message"
+                                                data-userid="@comment.UserID"
+                                                data-commentdatetime="@comment.CommentDateTime.ToString("o")">
+                                            <i class="fas fa-trash-alt"></i> Delete
+                                        </button>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="no-comments">
+                            <i class="fas fa-comment-slash me-2"></i>
+                            <span>No comments available for this movie.</span>
                         </div>
                     }
-                }
-                else
-                {
-                    <div class="no-comments">
-                        <i class="fas fa-comment-slash me-2"></i>
-                        <span>No comments available for this movie.</span>
-                    </div>
-                }
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-    // add comment modal
+                // add comment modal
     <div class="modal fade" id="commentModal" tabindex="-1" role="dialog" aria-labelledby="commentModalLabel">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -233,7 +254,7 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                
+
                 <div class="modal-body text-center">
                     <p id="selectedStarText"></p>
                     <div class="stars">
@@ -267,7 +288,7 @@
             });
 
             $("#submitComment").click(function () {
-                var movieId = "@Model.MovieID"; 
+                var movieId = "@Model.MovieID";
                 var message = $("#commentText").val();
 
                 if (message.trim() === "") {
@@ -276,7 +297,7 @@
                 }
 
                 $.ajax({
-                    url: '/Movie/AddComment', 
+                    url: '/Movie/AddComment',
                     method: 'POST',
                     data: {
                         movieId: movieId,
@@ -367,14 +388,14 @@
             });
 
             //Rating Script
-             $("#openModalBtn").click(function() {
+            $("#openModalBtn").click(function () {
                 var canRate = true;
 
         @if (Model.Ratings != null)
         {
             foreach (var rating in Model.Ratings)
             {
-                
+
                 if ((DateTime.Now - rating.RatingDateTime).TotalHours > 24 && rating.UserID == currentUserId)
                 {
                     // User has rated within the last 24 hours
@@ -384,13 +405,13 @@
             }
         }
 
-                if (!canRate) {
+                        if (!canRate) {
                     alert("You have already rated within the last 24 hours!");
                 } else {
                     // When the user can rate, show the rating modal
                     $("#ratingModal").modal('show');
                 }
-    });
+            });
 
             const stars = document.querySelectorAll('.star');
             let selectedStar = 0;
@@ -427,7 +448,7 @@
                 }
 
                 $.ajax({
-                    url: '/Movie/UpdateAverageRating', 
+                    url: '/Movie/UpdateAverageRating',
                     method: 'POST',
                     data: {
                         movieId: movieId,
@@ -443,8 +464,49 @@
                     }
                 });
             });
-     }); 
-            
+
+            // Edit Rating
+            $(".edit-rating").click(function () {
+                var currentRating = $(this).data("rating");
+                $("#selectedStarText").text(`You are editing your rating of ${currentRating} star(s)`);
+    
+                // Pre-select the stars based on current rating
+                stars.forEach((star, index) => {
+                    if (index < currentRating) {
+                        star.classList.add('selected');
+                    }
+                });
+
+                // Store the selected star value
+                selectedStar = currentRating;
+
+                $("#ratingModal").modal("show");
+            });
+
+            // Delete Rating
+            $(".delete-rating").click(function () {
+                var userId = $(this).data("userid");
+                var movieId = "@Model.MovieID";
+
+                if (confirm("Are you sure you want to delete your rating?")) {
+                    $.ajax({
+                        url: '/Movie/DeleteRating',
+                        method: 'POST',
+                        data: {
+                            movieId: movieId,
+                            userId: userId
+                        },
+                        success: function () {
+                            location.reload();
+                        },
+                        error: function () {
+                            alert("Failed to delete the rating. Please try again.");
+                        }
+                    });
+                }
+            });
+        });
+
         // Close the modal when the Cancel button is clicked
         $('#commentModal .btn-secondary, #commentModal .close').on('click', function () {
             $('#commentModal').modal('hide');
