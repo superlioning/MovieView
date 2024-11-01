@@ -425,54 +425,66 @@ body {
         }
 }
 
+/* Hero Section Styles */
 .hero-section {
     position: relative;
-    height: 70vh; /* Accounting for navbar and footer */
+    height: calc(100vh - 122px); /* Adjust for footer height */
     width: 100%;
-    overflow: hidden;
     color: white;
-    margin-top: calc((100vh - 88vh) / 2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 70px; /* Adjust for navbar height */
+    padding-bottom: 50px; /* Adjust for footer height */
+    overflow: hidden;
 }
 
-.hero-background {
-    position: absolute;
-    top: 0;
-    left: 0;
+.hero-carousel {
     width: 100%;
     height: 100%;
+    overflow: hidden;
+    border-radius: 20px; /* Rounded corners */
+    position: relative;
 }
 
-    .hero-background::after {
+    .hero-carousel .carousel-inner {
+        width: 100%;
+        height: 100%;
+    }
+
+    .hero-carousel .carousel-item {
+        width: 100%;
+        height: 100%;
+    }
+
+        .hero-carousel .carousel-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    .hero-carousel::after {
         content: '';
         position: absolute;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.6);
+        background: rgba(0, 0, 0, 0.6); /* Dark overlay */
         z-index: 1;
+        border-radius: 20px;
     }
-
-    .hero-background .carousel-item {
-        height: 70vh;
-    }
-
-        .hero-background .carousel-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center;
-        }
 
 .hero-content {
-    position: relative;
+    position: absolute;
     z-index: 2;
-    padding: 20px;
+    text-align: center;
     max-width: 800px;
+    padding: 0 15px;
 }
 
 .hero-title {
-    font-size: 3.5rem;
+    font-size: 3rem;
     font-weight: 700;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
@@ -498,11 +510,8 @@ body {
 
 @media (max-width: 768px) {
     .hero-section {
-        height: calc(100vh - 156px);
-    }
-
-    .hero-background .carousel-item {
-        height: calc(100vh - 156px);
+        padding-top: 60px; /* Adjust for smaller navbar on mobile */
+        padding-bottom: 50px;
     }
 
     .hero-title {
