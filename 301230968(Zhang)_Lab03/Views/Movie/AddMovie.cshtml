@@ -1,0 +1,266 @@
+﻿@model _301230968_Zhang__Lab03.Models.MovieViewModel
+
+@{
+    ViewData["Title"] = "Add Movie";
+    var currentUsername = Context.Session.GetString("Username");
+    var currentUserId = Context.Session.GetString("UserId");
+
+}
+@if (TempData["Message"] != null)
+{
+    <div id="tempMessage" class="alert alert-success">
+        @TempData["Message"]
+    </div>
+}
+
+@if (currentUserId != null && currentUsername != null)
+{
+    <div class="user-info-banner bg-light">
+        <span class="username">Hello, @currentUsername</span>
+        <span class="user-id">(@currentUserId)</span>
+    </div>
+
+    @if (TempData["MovieExists"] != null)
+    {
+        <div id="movieExistsModal" class="modal fade" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Movie Already Exists</h5>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <p>A movie with this IMDb ID already exists. Would you like to add a new movie?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="window.location.href='@Url.Action("Index")'">No</button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Yes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="container mt-2 mb-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-secondary text-white text-center">
+                        <h2 class="mb-0">Add New Movie</h2>
+                    </div>
+                    <div class="card-body">
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                        <form method="post" enctype="multipart/form-data" asp-action="AddMovie">
+                            <!-- MovieID -->
+                            <div class="form-group mb-3">
+                                <label asp-for="MovieID">IMDb ID</label>
+                                <input asp-for="MovieID" class="form-control" placeholder="Enter IMDb ID (e.g., tt1234567)" />
+                                <span asp-validation-for="MovieID" class="text-danger"></span>
+                            </div>
+
+                            <!-- Title -->
+                            <div class="form-group mb-3">
+                                <label asp-for="Title"></label>
+                                <input asp-for="Title" class="form-control" />
+                                <span asp-validation-for="Title" class="text-danger"></span>
+                            </div>
+
+                            <!-- Genre -->
+                            <div class="form-group mb-3">
+                                <label asp-for="Genre"></label>
+                                <select asp-for="Genre" class="form-control" asp-items="@(new SelectList(ViewBag.Genres))">
+                                    <option value="">Select a genre</option>
+                                </select>
+                                <span asp-validation-for="Genre" class="text-danger"></span>
+                            </div>
+
+                            <!-- Description -->
+                            <div class="form-group mb-3">
+                                <label asp-for="Description"></label>
+                                <textarea asp-for="Description" class="form-control"></textarea>
+                                <span asp-validation-for="Description" class="text-danger"></span>
+                            </div>
+
+                            <!-- Release Date -->
+                            <div class="form-group mb-3">
+                                <label asp-for="ReleaseDate">Release Date (Optional)</label>
+                                <input asp-for="ReleaseDate" class="form-control" placeholder="YYYY, YYYY-MM, or YYYY-MM-DD" />
+                                <span asp-validation-for="ReleaseDate" class="text-danger"></span>
+                            </div>
+
+                            <!-- Directors -->
+                            <div class="form-group mb-3">
+                                <label asp-for="Directors">Director(s)</label>
+                                <div id="directorInputs">
+                                    <div class="input-group mb-2">
+                                        <input type="text" class="form-control" name="Directors[0]" required>
+                                        <button type="button" class="btn btn-outline-success" id="addDirector">+</button>
+                                        <button type="button" class="btn btn-outline-danger" onclick="removeElement(this)">-</button>
+                                        <span asp-validation-for="Directors" class="text-danger"></span>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <!-- Actors -->
+                            <div class="form-group mb-3">
+                                <label asp-for="Actors">Actor(s)</label>
+                                <div id="actorInputs">
+                                    <div class="input-group mb-2">
+                                        <input type="text" class="form-control" name="Actors[0]" required>
+                                        <button type="button" class="btn btn-outline-success" id="addActor">+</button>
+                                        <button type="button" class="btn btn-outline-danger" onclick="removeElement(this)">-</button>
+                                        <span asp-validation-for="Actors" class="text-danger"></span>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <!-- Movie File -->
+                            <div class="form-group mb-3">
+                                <label asp-for="MovieFile">Movie File</label>
+                                <input type="file" asp-for="MovieFile" class="form-control" />
+                                <span asp-validation-for="MovieFile" class="text-danger"></span>
+                            </div>
+
+                            <!-- Image File -->
+                            <div class="form-group mb-4">
+                                <label asp-for="ImageFile">Image File</label>
+                                <input type="file" asp-for="ImageFile" class="form-control" />
+                                <span asp-validation-for="ImageFile" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group d-flex justify-content-between mb-3">
+                                <button type="submit" class="btn btn-primary">Add Movie</button>
+                                <button type="button" class="btn btn-secondary" onclick="confirmCancel()">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="cancelModal" class="modal fade" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Cancel</h5>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to abandon adding this movie?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                    <button type="button" class="btn btn-primary" onclick="confirmCancelAction()">Yes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+
+            function createInputGroup(name) {
+                let parentElement;
+                if (name === 'Directors') {
+                    parentElement = document.getElementById('directorInputs');
+                } else if (name === 'Actors') {
+                    parentElement = document.getElementById('actorInputs');
+                }
+
+                // Calculate the current index based on existing input elements
+                const currentIndex = parentElement.querySelectorAll('input').length;
+
+                const div = document.createElement('div');
+                div.className = 'input-group mb-2';
+
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'form-control';
+                input.name = name + '[' + currentIndex + ']';
+                input.required = true;
+
+                const addButton = document.createElement('button');
+                addButton.type = 'button';
+                addButton.className = 'btn btn-outline-success';
+                addButton.textContent = '+';
+                addButton.onclick = function () { addElement(name) };
+
+                const removeButton = document.createElement('button');
+                removeButton.type = 'button';
+                removeButton.className = 'btn btn-outline-danger ml-2';
+                removeButton.textContent = '-';
+                removeButton.onclick = function () { removeElement(removeButton) };
+
+                div.appendChild(input);
+                div.appendChild(addButton);
+                div.appendChild(removeButton);
+
+                return div;
+            }
+
+            function addElement(name) {
+                let parentElement;
+                if (name === 'Directors') {
+                    parentElement = document.getElementById('directorInputs');
+                } else if (name === 'Actors') {
+                    parentElement = document.getElementById('actorInputs');
+                }
+
+                parentElement.appendChild(createInputGroup(name));
+            }
+
+            document.getElementById('addDirector').addEventListener('click', function () {
+                addElement('Directors');
+            });
+
+            document.getElementById('addActor').addEventListener('click', function () {
+                addElement('Actors');
+            });
+        });
+
+        function removeElement(button) {
+            const inputGroup = button.closest('.input-group');
+            const parent = inputGroup.parentNode;
+            if (parent.childElementCount > 1) {
+                inputGroup.remove();
+            }
+
+            // Optional: After removal, you might want to re-index the remaining inputs for cleaner indices.
+            const inputs = parent.querySelectorAll('input');
+            inputs.forEach((input, index) => {
+                input.name = input.name.replace(/\[\d+\]/, '[' + index + ']');
+            });
+        }
+
+        $(document).ready(function () {
+            if (@Json.Serialize(TempData["MovieExists"])) {
+                $('#movieExistsModal').modal('show');
+            }
+        });
+
+        function confirmCancel() {
+            $('#cancelModal').modal('show');
+        }
+
+        function confirmCancelAction() {
+            $.post('@Url.Action("CancelAddMovie")', function (response) {
+                window.location.href = response.redirectToUrl;
+            });
+        }
+
+        $('#movieExistsModal .btn-primary, #movieExistsModal .close').on('click', function () {
+            $('#movieExistsModal').modal('hide');
+        });
+
+        $('#cancelModal .btn-secondary, #cancelModal .close').on('click', function () {
+            $('#cancelModal').modal('hide');
+        });
+    </script>
+}

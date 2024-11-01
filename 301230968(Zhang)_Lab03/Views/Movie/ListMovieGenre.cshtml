@@ -1,0 +1,112 @@
+﻿@model IEnumerable<Movie>
+@{
+    ViewBag.Title = "List Movies by Genre";
+    var currentUsername = Context.Session.GetString("Username");
+    var currentUserId = Context.Session.GetString("UserId");
+}
+
+@if (currentUserId != null && currentUsername != null)
+{
+    <div class="movie-list-container">
+        <div class="user-info-banner bg-light">
+            <span class="username">Hello, @currentUsername</span>
+            <span class="user-id">(@currentUserId)</span>
+        </div>
+
+        <div class="container my-4">
+            <h2 class="mb-4 text-primary">Filter Movies by Genre</h2>
+
+            <!-- Filter Section -->
+            <div class="filter-section bg-light p-3 rounded shadow-sm mb-4">
+                <div class="d-flex align-items-center gap-3">
+                    <label for="genreFilter" class="form-label mb-0">Filter by Genre:</label>
+                    <select id="genreFilter" class="form-select w-auto">
+                        <option value="">Select Genre</option>
+                        @foreach (var genre in ViewBag.Genres)
+                        {
+                            <option value="@genre">@genre</option>
+                        }
+                    </select>
+                    <button class="btn btn-primary px-4" onclick="filterMovies()">
+                        <i class="fas fa-search me-2"></i>Search
+                    </button>
+                </div>
+            </div>
+
+            <!-- Movies List -->
+            <div id="moviesList"></div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize movies array using Razor syntax
+        const movies = [
+        @foreach (var movie in Model)
+        {
+            @:{
+            @:    id: "@movie.MovieID",
+            @:    title: "@movie.Title",
+            @:    genre: "@movie.Genre",
+            @:    imageUrl: "@movie.ImageUrl",
+            @:    movieUrl: "@movie.MovieUrl"
+            @:},
+        }
+        ];
+
+        function filterMovies() {
+            let selectedGenre = document.getElementById("genreFilter").value;
+            let filteredMovies = movies.filter(movie => selectedGenre === "" || movie.genre === selectedGenre);
+                    displayMovies(filteredMovies);
+                }
+
+                function displayMovies(movieList) {
+                    let moviesContainer = document.getElementById("moviesList");
+                    moviesContainer.innerHTML = '';
+
+                    movieList.forEach(movie => {
+                        moviesContainer.innerHTML += `
+                            <div class="movie-card mb-4 bg-white rounded-3 shadow-sm overflow-hidden">
+                                <div class="row g-0">
+                                    <div class="col-md-3 col-lg-2 poster-container">
+                                        <img src="${movie.imageUrl}"
+                                             class="movie-poster"
+                                             alt="${movie.title}">
+                                    </div>
+                                    <div class="col-md-9 col-lg-10">
+                                        <div class="card-body d-flex flex-column h-100">
+                                            <div class="mb-auto">
+                                                <h5 class="movie-title mb-3">${movie.title}</h5>
+                                                <div class="genre-badge mb-3">
+                                                    <i class="fas fa-film me-2"></i>${movie.genre}
+                                                </div>
+                                            </div>
+                                            <div class="movie-actions">
+                                                <a href="/Movie/ShowDetail/${movie.id}"
+                                           class="btn btn-info">
+                                            <i class="fas fa-info-circle me-2"></i>Show Detail
+                                                </a>
+                                        <a href="${movie.movieUrl}"
+                                           class="btn btn-primary">
+                                                <i class="fas fa-play me-2"></i>Watch Now
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+
+                // Load all movies on initial page load
+                displayMovies(movies);
+    </script>
+}
+else
+{
+    <div class="container mt-5">
+        <div class="alert alert-info text-center">
+            <i class="fas fa-info-circle me-2"></i>Please log in to view movies.
+        </div>
+    </div>
+}

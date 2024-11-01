@@ -1,0 +1,37 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<!-- Hero Section -->
+<div class="hero-section d-flex align-items-center justify-content-center">
+    <div id="heroCarousel" class="carousel slide hero-background" data-bs-ride="carousel">
+        <div class="carousel-inner">
+            <div class="carousel-item active" data-bs-interval="2000">
+                <img src="https://pdf-repository-for-assignment-2.s3.ca-central-1.amazonaws.com/chris-murray-iwfHhOZLVMU-unsplash.jpg" alt="Movie 1">
+            </div>
+            <div class="carousel-item" data-bs-interval="2000">
+                <img src="https://pdf-repository-for-assignment-2.s3.ca-central-1.amazonaws.com/jakob-owens-MCZwgyjXbQ0-unsplash.jpg" alt="Movie 2">
+            </div>
+            <div class="carousel-item" data-bs-interval="2000">
+                <img src="https://pdf-repository-for-assignment-2.s3.ca-central-1.amazonaws.com/jakob-owens-CiUR8zISX60-unsplash.jpg" alt="Movie 3">
+            </div>
+        </div>
+    </div>
+
+    <div class="hero-content text-center">
+        <h1 class="hero-title mb-4">Welcome to MovieScape</h1>
+        <p class="hero-subtitle mb-5">Discover, Watch, and Share Your Favorite Films</p>
+
+        @if (Context.Session.GetString("Username") == null)
+        {
+            <div class="cta-buttons">
+                <a href="@Url.Action("Register", "User")" class="btn btn-primary btn-lg me-3">
+                    <i class="fas fa-user-plus me-2"></i>Join Now
+                </a>
+                <a href="@Url.Action("Login", "User")" class="btn btn-outline-light btn-lg">
+                    <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                </a>
+            </div>
+        }
+    </div>
+</div>

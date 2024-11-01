@@ -1,0 +1,29 @@
+﻿<ul class="navbar-nav navbar-right">
+    @if (Context.Session.GetString("Username") == null)
+    {
+        <li class="nav-item">
+            <a class="nav-link" asp-area="" asp-controller="User" asp-action="Register">Register</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" asp-area="" asp-controller="User" asp-action="Login">Login</a>
+        </li>
+    }
+    else
+    {
+        <li class="nav-item">
+            <a class="nav-link" asp-area="" asp-controller="Movie" asp-action="Index">List Movies</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" asp-area="" asp-controller="Movie" asp-action="ListMovieRating">List Movies by Rating</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" asp-area="" asp-controller="Movie" asp-action="ListMovieGenre">List Movies by Genre</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" asp-area="" asp-controller="Movie" asp-action="AddMovie">Add Movie</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" asp-area="" asp-controller="User" asp-action="Logout">Logout</a>
+        </li>
+    }
+</ul>
