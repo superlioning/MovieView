@@ -29,14 +29,14 @@ namespace _301230968_Zhang__Lab03
             });
 
             // DB
-            //builder.Configuration.AddSystemsManager("/APIEngineeringLab03", new Amazon.Extensions.NETCore.Setup.AWSOptions
-            //{
-            //    Region = RegionEndpoint.CACentral1
-            //});
+            builder.Configuration.AddSystemsManager("/APIEngineeringLab03", new Amazon.Extensions.NETCore.Setup.AWSOptions
+            {
+                Region = RegionEndpoint.CACentral1
+            });
 
             var connectionString = new SqlConnectionStringBuilder(builder.Configuration.GetConnectionString("Connection2RDS"));
-            //connectionString.UserID = builder.Configuration["DbUser"];
-            //connectionString.Password = builder.Configuration["DbPassword"];
+            connectionString.UserID = builder.Configuration["DbUser"];
+            connectionString.Password = builder.Configuration["DbPassword"];
             builder.Services.AddDbContext<MovieContext>(options => options.UseSqlServer(connectionString.ConnectionString));
 
             // Register repository and service 
