@@ -18,6 +18,7 @@ namespace _301230968_Zhang__Lab03.Connector
         {
             var awsOptions = configuration.GetSection("AWS");
             var credentials = new BasicAWSCredentials(awsOptions["AccessKeyId"], awsOptions["SecretAccessKey"]);
+            // Specify the region as Central Canada
             var region = RegionEndpoint.CACentral1;
 
             S3Client = new AmazonS3Client(credentials, region);
