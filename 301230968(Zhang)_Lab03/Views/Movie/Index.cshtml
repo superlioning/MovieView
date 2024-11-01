@@ -1,6 +1,6 @@
 ﻿@model IEnumerable<Movie>
 @{
-    ViewBag.Title = "Movie Index";
+    ViewBag.Title = "All Movies";
     var currentUsername = Context.Session.GetString("Username");
     var currentUserId = Context.Session.GetString("UserId");
 }
@@ -42,6 +42,9 @@
                                         <p class="movie-description">@movie.Description</p>
                                         <p class="movie-genre">
                                             <strong>Genre:</strong> @movie.Genre
+                                        </p>
+                                        <p class="movie-rating">
+                                            <strong>Rating:</strong> @(movie.AverageRating.HasValue ? movie.AverageRating.Value.ToString("F1") + "/10" : "Not Available")
                                         </p>
 
                                         <!-- Action Buttons -->
