@@ -490,6 +490,98 @@ namespace _301230968_Zhang__Lab03.Controllers
             }
         }
 
+        [HttpPost]
+        public async Task<IActionResult> EditRating(string movieId, int originalRatingValue, int newRatingValue)
+        {
+            var userId = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("Please login to continue.");
+            }
+
+            try
+            {
+                var movie = await _movieService.GetMovieByIdAsync(movieId);
+                if (movie == null)
+                    return NotFound("Movie not found.");
+
+                var existingRating = movie.Ratings.FirstOrDefault(r => r.UserID == userId && r.RateValue == originalRatingValue);
+
+                if (existingRating != null)
+                {
+                    // Update the existing rating
+                    existingRating.RateValue = newRatingValue;
+                    existingRating.RatingDateTime = DateTime.Now;
+
+                    // Recalculate average rating
+                    var totalRatingValue = movie.Ratings.Sum(r => r.RateValue);
+                    var totalRatingsCount = movie.Ratings.Count();
+                    movie.AverageRating = totalRatingsCount > 0 ? totalRatingValue / totalRatingsCount : 0;
+
+                    await _movieService.EditCommentMovieAsync(movie);
+                    return Ok("Rating updated successfully.");
+                }
+                else
+                {
+                    return NotFound("Rating not found.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("Failed to edit the rating: " + ex.Message);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteRating(string movieId)
+        {
+            var userId = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("Please login to continue.");
+            }
+
+            try
+            {
+                var movie = await _movieService.GetMovieByIdAsync(movieId);
+                if (movie == null)
+                    return NotFound("Movie not found.");
+
+                // Find the existing rating for this user
+                var existingRating = movie.Ratings?.FirstOrDefault(r => r.UserID == userId);
+
+                if (existingRating != null)
+                {
+                    // Remove the existing rating
+                    movie.Ratings.Remove(existingRating);
+
+                    // Recalculate the average rating after deletion
+                    if (movie.Ratings.Any())
+                    {
+                        var totalRatingValue = movie.Ratings.Sum(r => r.RateValue);
+                        var totalRatingsCount = movie.Ratings.Count();
+                        movie.AverageRating = totalRatingValue / totalRatingsCount;
+                    }
+                    else
+                    {
+                        movie.AverageRating = null; // No ratings left, average is null
+                    }
+
+                    // Update the movie in the database
+                    await _movieService.EditCommentMovieAsync(movie);
+                    return Ok(); // Return success
+                }
+                else
+                {
+                    return NotFound("Rating not found.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Failed to delete the rating: {ex.Message}");
+            }
+        }
+
         public async Task<IActionResult> DownloadMovie(string movieId)
         {
             // Fetch the movie details based on the movieId
