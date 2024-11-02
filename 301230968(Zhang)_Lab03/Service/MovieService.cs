@@ -50,7 +50,7 @@ namespace _301230968_Zhang__Lab03.Service
                     MovieUrl = movieUrl,
                     ImageUrl = imageUrl,
                     UserID = model.UserID,
-                    ReleaseDate = model.ReleaseDate ?? DateTime.UtcNow.ToString("yyyy-MM-dd")
+                    ReleaseDate = model.ReleaseDate
                 };
 
                 await _movieRepository.AddMovieAsync(movie);
@@ -212,7 +212,7 @@ namespace _301230968_Zhang__Lab03.Service
                     MovieUrl = model.MovieFileUrl ?? existingMovie.MovieUrl,
                     ImageUrl = model.ImageFileUrl ?? existingMovie.ImageUrl,
                     UserID = model.UserID,
-                    ReleaseDate = existingMovie.ReleaseDate
+                    ReleaseDate = model.ReleaseDate ?? existingMovie.ReleaseDate
                 };
 
                 await _movieRepository.UpdateMovieAsync(movieToUpdate);

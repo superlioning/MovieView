@@ -51,6 +51,7 @@
                     <div class="card-body">
                         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
                         <form method="post" enctype="multipart/form-data" asp-action="AddMovie">
+                            <input type="hidden" name="UserID" value="@currentUserId" />
                             <!-- MovieID -->
                             <div class="form-group mb-3">
                                 <label asp-for="MovieID">IMDb ID</label>

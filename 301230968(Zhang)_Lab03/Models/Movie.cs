@@ -9,7 +9,7 @@ namespace _301230968_Zhang__Lab03.Models
         public string? MovieID { get; set; }
 
         [DynamoDBProperty("ReleaseDate")]
-        public String ReleaseDate { get; set; }
+        public string? ReleaseDate { get; set; }
 
         [DynamoDBProperty("MovieUrl")]
         public string? MovieUrl { get; set; }
