@@ -5,6 +5,7 @@ using _301230968_Zhang__Lab03.Connector;
 using _301230968_Zhang__Lab03.Models;
 using _301230968_Zhang__Lab03.Repository;
 using _301230968_Zhang__Lab03.Service;
+using Amazon.Runtime;
 
 namespace _301230968_Zhang__Lab03
 {
@@ -28,11 +29,20 @@ namespace _301230968_Zhang__Lab03
                 options.Cookie.IsEssential = true;
             });
 
-            // DB
-            builder.Configuration.AddSystemsManager("/APIEngineeringLab03", new Amazon.Extensions.NETCore.Setup.AWSOptions
+            var awsOptions = new Amazon.Extensions.NETCore.Setup.AWSOptions
             {
+                Credentials = new BasicAWSCredentials(
+                builder.Configuration["AWS:AccessKeyId"],
+                builder.Configuration["AWS:SecretAccessKey"]
+                ),
                 Region = RegionEndpoint.CACentral1
-            });
+            };
+
+            builder.Configuration.AddSystemsManager("/APIEngineeringLab03", awsOptions);
+            //builder.Configuration.AddSystemsManager("/APIEngineeringLab03", new Amazon.Extensions.NETCore.Setup.AWSOptions
+            //{
+            //    Region = RegionEndpoint.CACentral1
+            //});
 
             var connectionString = new SqlConnectionStringBuilder(builder.Configuration.GetConnectionString("Connection2RDS"));
             connectionString.UserID = builder.Configuration["DbUser"];
